@@ -1,0 +1,7 @@
+node_modules
+
+# exclude everything
+api/images/*
+
+# exception to the rule
+!api/images/.gitkeep 
