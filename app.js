@@ -11,6 +11,7 @@ const userRoutes = require('./api/routes/users');
 const interestRoutes = require('./api/routes/interests');
 const categoryRoutes = require('./api/routes/categories');
 const keyRoutes = require('./api/routes/keys');
+const addressRoutes = require('./api/routes/addresses');
 
 app.use(bodyParser.json());
 app.use(morgan('tiny'));
@@ -20,5 +21,6 @@ app.use('/users', userRoutes);
 app.use('/interests', interestRoutes);
 app.use('/categories', categoryRoutes);
 app.use('/keys', keyRoutes);
+app.use('/addresses', addressRoutes);
 
 module.exports = app;

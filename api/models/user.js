@@ -54,6 +54,10 @@ const userSchema = new Schema({
 		type:Number,
 		default:0
 	},
+	addresses:[{
+		type:mongoose.Schema.Types.ObjectId,
+		ref:'Address'
+	}],
 	interests:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:'Interest'
