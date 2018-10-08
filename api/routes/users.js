@@ -79,19 +79,6 @@ router.post('/signin', (req, res, next) => {
 	})
 })
 
-router.get('/interests', checkAuth, (req, res) => {
-	Interest.find({_creator: req.userData._id}).then((interests) => {
-		res.status(200).json({
-			count:interests.length,
-			interests:interests
-		});
-	}).catch((err) => {
-		res.status(500).json({
-			error:err
-		});
-	});
-});
-
 router.patch('/', checkAuth, (req,res) => {
 	var body = _.pick(req.body,['fullName', 'cpf', 'telephone', 'cellphone', 'useWhatsapp']);
 

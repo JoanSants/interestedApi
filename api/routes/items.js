@@ -29,33 +29,23 @@ const upload = multer({
 });
 
 const checkAuth = require('./../middleware/checkAuth');
-const Interest = require('./../models/interest');
-const Category = require('./../models/category');
+const Item = require('./../models/item');
 const User = require('./../models/user');
 
-router.post('/', checkAuth , upload.single('interestImage'), (req,res) => {
-	var body = _.pick(req.body,['_category','name','description','price']);
-
-	Category.findById(body._category).then((category) => {
-		if(!category){
-			fs.unlinkSync(`./api/images/${req.file.filename}`);
-			return res.status(404).json({
-				message:'Category not found'
-			});
-		}
+router.post('/', checkAuth , upload.single('itemImage'), (req,res) => {
+	var body = _.pick(req.body,['title','description','originCep','sendable','active']);
 	
 		body.createdAt = new Date();		
-		body._creator = req.userData._id;
-		
+		body._creator = req.userData._id;			
 		if(req.file){
 			body.imageName = req.file.filename;
 			body.image = url + '/images/'+ req.file.filename;
 		}
 		
-		var interest = new Interest(body);
-		interest.save().then((interest) => {
+		var item = new Item(body);
+		item.save().then((item) => {
 
-			User.findOneAndUpdate({_id:interest._creator}, {$addToSet:{interests:interest._id}}).then()
+			User.findOneAndUpdate({_id:item._creator}, {$addToSet:{items:item._id}}).then()
 			.catch(err => {
 				return res.status(500).json({
 					error:err
@@ -63,26 +53,24 @@ router.post('/', checkAuth , upload.single('interestImage'), (req,res) => {
 			})
 
 			res.status(201).json({
-				interest:interest
+				item:item
 			});
 		}).catch(err => {
+			fs.unlinkSync(`./api/images/${req.file.filename}`);
 			res.status(500).json({
 				error:err
 			})
-		})
-	}).catch(err => {
-		fs.unlinkSync(`./api/images/${req.file.filename}`);
-		res.status(500).json({
-			error:err
 		});
-	});
 });
 
-router.get('/', (req, res) => {
-	Interest.find({active:true}).then((interests) => {
+router.get('/', checkAuth, (req, res) => {
+	Item.find({
+        active:true,
+        _creator:req.userData._id
+    }).then((items) => {
 		res.status(200).json({
-			count:interests.length,
-			interests:interests
+			count:items.length,
+			items:items
 		});
 	}).catch(err => {
 		res.status(500).json({
@@ -91,21 +79,24 @@ router.get('/', (req, res) => {
 	})
 });
 
-router.get('/:id', (req,res)=>{
+router.get('/:id', checkAuth, (req,res)=>{
 	var _id = req.params.id;
 	if(!ObjectID.isValid(_id)){
 		return res.status(404).json({
-			message:'Interest not found'
+			message:'Item not found'
 		});
 	}
-	Interest.findById({_id}).then((interest)=>{
-		if(!interest){
+	Item.find({
+        _id:_id,
+        _creator:req.userData._id
+    }).then((item)=>{
+		if(!item){
 			return res.status(404).json({
-				message:'Interest not found'
+				message:'item not found'
 			});
 		}
 		res.status(200).json({
-			interest:interest
+			item:item
 		});
 	}).catch((err) => {
 		res.status(500).json({
@@ -114,9 +105,9 @@ router.get('/:id', (req,res)=>{
 	});
 });
 
-router.patch('/:id', checkAuth, upload.single('interestImage'), (req, res) => {
+router.patch('/:id', checkAuth, upload.single('itemImage'), (req, res) => {
 	var id = req.params.id;
-	var body = _.pick(req.body,['_category','name','description','price']);
+	var body = _.pick(req.body,['title','description','originCep','sendable','active']);
 
 	if(req.file){
 		body.imageName = req.file.filename;
@@ -125,25 +116,24 @@ router.patch('/:id', checkAuth, upload.single('interestImage'), (req, res) => {
 
 	if(!ObjectID.isValid(id)){
 		return res.status(404).json({
-			message:'Interest not found'
+			message:'Item not found'
 		});
 	}
 
-	Interest.findOneAndUpdate({_id:id,_creator:req.userData._id}, {$set:body}, {new:false}).then((interestOld) => {
-		if(!interestOld){
+	Item.findOneAndUpdate({_id:id,_creator:req.userData._id}, {$set:body}, {new:false}).then((itemOld) => {
+		if(!itemOld){
 			return res.status(404).json({
-				message:'interest not found'
+				message:'item not found'
 			});
 		}
 
-		Interest.findById({_id:id}).then((interest) => {
-			if(interest.imageName !== interestOld.imageName){
-				fs.unlinkSync(`./api/images/${interestOld.imageName}`);
+		Item.findById({_id:id}).then((item) => {
+			if(item.imageName !== itemOld.imageName){
+				fs.unlinkSync(`./api/images/${itemOld.imageName}`);
 			}
 
 			return res.json({
-				InteresUpdated:true,
-				interest:interest
+				itemUpdated:item
 			});
 		});
 
@@ -159,54 +149,40 @@ router.delete('/:id', checkAuth, (req,res) => {
 
 	if(!ObjectID.isValid(id)){
 		return res.status(404).json({
-			message:'Interest not found'
+			message:'Item not found'
 		});
 	}
 
-	Interest.findOneAndRemove({
+	Item.findOneAndRemove({
 		_id:id,
 		_creator:req.userData._id
-	}).then((interest) => {
-		if(!interest){
+	}).then((item) => {
+		if(!item){
 			try{
-			fs.unlinkSync(`./api/images/${interest.imageName}`);
+			fs.unlinkSync(`./api/images/${item.imageName}`);
 			}catch(e){
 
 			}
 			return res.status(404).json({
-				message:'Interest not found'
+				message:'Item not found'
 			});
 		}
-		fs.unlinkSync(`./api/images/${interest.imageName}`);
+		fs.unlinkSync(`./api/images/${item.imageName}`);
 
-		User.findOneAndUpdate({_id:interest._creator}, {$pull:{interests:interest._id}}).then()
+		User.findOneAndUpdate({_id:item._creator}, {$pull:{items:item._id}}).then()
 		.catch(err => {
 			return res.status(500).json({
 				error:err
 			})
 		})
 		res.status(200).json({
-			interestDeleted:true,
-			interest:interest
+			itemDeleted:item
 		});
 	}).catch((err) => {
 		res.status(500).json({
 			error:err
 		});
 	})
-});
-
-router.get('/my', checkAuth, (req, res) => {
-	Interest.find({_creator: req.userData._id}).then((interests) => {
-		res.status(200).json({
-			count:interests.length,
-			interests:interests
-		});
-	}).catch((err) => {
-		res.status(500).json({
-			error:err
-		});
-	});
 });
 
 module.exports = router;

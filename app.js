@@ -12,6 +12,8 @@ const interestRoutes = require('./api/routes/interests');
 const categoryRoutes = require('./api/routes/categories');
 const keyRoutes = require('./api/routes/keys');
 const addressRoutes = require('./api/routes/addresses');
+const itemRoutes = require('./api/routes/items');
+const proposalRoutes = require('./api/routes/proposals');
 
 app.use(bodyParser.json());
 app.use(morgan('tiny'));
@@ -22,5 +24,7 @@ app.use('/interests', interestRoutes);
 app.use('/categories', categoryRoutes);
 app.use('/keys', keyRoutes);
 app.use('/addresses', addressRoutes);
+app.use('/items', itemRoutes);
+app.use('/proposals', proposalRoutes);
 
 module.exports = app;

@@ -51,7 +51,10 @@ const interestSchema = new Schema({
 	_order:{
 		type: mongoose.Schema.Types.ObjectId,
 		default:null
-	}
+	},
+	proposals:[{
+		type:mongoose.Schema.Types.ObjectId
+	}]
 });
 
 interestSchema.methods.toJSON = function(){

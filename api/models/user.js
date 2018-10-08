@@ -61,14 +61,18 @@ const userSchema = new Schema({
 	interests:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:'Interest'
-    }]/*,
-	_contact:[{
+    }],items:[{
+		type:mongoose.Schema.Types.ObjectId,
+        ref:'Items'
+	}],
+    proposalsDone:[{
         type:mongoose.Schema.Types.ObjectId,
-    }],
-    proposals:[{
-        _id:mongoose.Schema.Types.ObjectId,
-        ref:'Proposal'
-    }]*/
+	  	ref:'Proposal'
+	}],
+	proposalsReceived:[{
+        type:mongoose.Schema.Types.ObjectId,
+	  	ref:'Proposal'
+    }]
 });
 
 userSchema.methods.toJSON = function () {
