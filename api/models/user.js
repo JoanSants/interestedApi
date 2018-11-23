@@ -72,7 +72,12 @@ const userSchema = new Schema({
 	proposalsReceived:[{
         type:mongoose.Schema.Types.ObjectId,
 	  	ref:'Proposal'
-    }]
+	}]/*,
+	AccessTries: {
+		time: Date,
+		tries: Number
+	}
+	*/
 });
 
 userSchema.methods.toJSON = function () {
