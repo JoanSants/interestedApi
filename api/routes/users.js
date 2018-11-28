@@ -35,9 +35,12 @@ router.post('/signup', (req, res) => {
 					_id: user._id,
 					email: user.email
 				}, process.env.JWT_KEY, {
-						expiresIn: "1d"
+						expiresIn: "1h"
 					});
-				res.status(201).header({ 'x-auth': token }).json({ user: user });
+				res.status(201).header({ 'x-auth': token }).json({ 
+					user: user,
+					expiresIn: 3600
+				 });
 			}).catch((err) => {
 				res.status(500).json({ error: err });
 			});
@@ -64,11 +67,12 @@ router.post('/signin', (req, res, next) => {
 					_id: user._id,
 					email: user.email
 				}, process.env.JWT_KEY, {
-						expiresIn: "1d"
-					});
+						expiresIn: "1h"
+				});
 
 				return res.status(200).header({ 'x-auth': token }).json({
-					user: user
+					user: user,
+					expiresIn: 3600
 				})
 			}
 
