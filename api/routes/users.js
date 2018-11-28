@@ -37,8 +37,9 @@ router.post('/signup', (req, res) => {
 				}, process.env.JWT_KEY, {
 						expiresIn: "1h"
 					});
-				res.status(201).header({ 'x-auth': token }).json({ 
+				res.status(201).json({ 
 					user: user,
+					token: token,
 					expiresIn: 3600
 				 });
 			}).catch((err) => {
@@ -70,8 +71,9 @@ router.post('/signin', (req, res, next) => {
 						expiresIn: "1h"
 				});
 
-				return res.status(200).header({ 'x-auth': token }).json({
+				return res.status(200).json({
 					user: user,
+					token: token,
 					expiresIn: 3600
 				})
 			}
