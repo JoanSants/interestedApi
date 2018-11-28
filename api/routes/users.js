@@ -12,7 +12,7 @@ const checkAuth = require('./../middleware/checkAuth');
 
 const transporter = nodemailer.createTransport(sendgridTransport({
 	auth: {
-		api_key: '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'
+		api_key: process.env.EMAIL_KEY
 	}
 }));
 

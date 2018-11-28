@@ -1,7 +1,0 @@
-{
-    "env": {
-        "MONGO_ATLAS_PW":"4McqtidTZdJ6vjVw",
-        "JWT_KEY":"CACB87abc78GC78ACYV8",
-        "APP_URL":"http:localhost:3000/"
-    }
-}
