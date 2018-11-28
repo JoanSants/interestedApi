@@ -27,9 +27,6 @@ app.use((req, res, next) => {
         method: req.method,
         ip: req.ip,
         hostname: req.hostname,
-        url:req.baseUrl,
-        header:req.header,
-        body: req.body,
         status: res.statusCode,
         time: new Date()
         
