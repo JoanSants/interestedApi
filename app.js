@@ -3,7 +3,8 @@ const app = express();
 const url = process.env.APP_URL;
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
-const mongoose = require('mongoose'); 
+const mongoose = require('mongoose');
+const fs = require('fs');
 
 mongoose.connect('mongodb+srv://InterestAdmin:'+ process.env.MONGO_ATLAS_PW +'@interessados-mmfsj.mongodb.net/interesteds?retryWrites=true',{ useNewUrlParser: true });
 
@@ -19,6 +20,23 @@ app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
 app.use(morgan('tiny'));
 app.use('/images', express.static('./api/images'));
+app.use('/logs', express.static('./api/public/logs.txt'));
+
+app.use((req, res, next) => {
+    const dataLog = {
+        method: req.method,
+        ip: req.ip,
+        hostname: req.hostname,
+        url:req.baseUrl,
+        header:req.header,
+        body: req.body,
+        status: res.statusCode,
+        time: new Date()
+        
+    }   
+    fs.appendFileSync('./api/public/logs.txt',JSON.stringify(dataLog));
+    next();
+})
 
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin","*");

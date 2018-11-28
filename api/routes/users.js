@@ -3,10 +3,18 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const _ = require('lodash');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
+const sendgridTransport = require('nodemailer-sendgrid-transport');
 
 const User = require('./../models/user');
 const Interest = require('./../models/interest');
 const checkAuth = require('./../middleware/checkAuth');
+
+const transporter = nodemailer.createTransport(sendgridTransport({
+	auth: {
+		api_key: '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'
+	}
+}));
 
 
 router.post('/signup', (req, res) => {
@@ -71,6 +79,13 @@ router.post('/signin', (req, res, next) => {
 						expiresIn: "1h"
 				});
 
+				transporter.sendMail({
+					to: user.email,
+					from: 'interested@marketplace.com',
+					subject: 'Login Realizado',
+					html: '<h1>Novo login realizado</h1>'
+				})
+
 				return res.status(200).json({
 					user: user,
 					token: token,
@@ -117,7 +132,13 @@ router.patch('/', checkAuth, (req, res) => {
 	var body = _.pick(req.body, ['fullName', 'cpf', 'telephone', 'cellphone', 'useWhatsapp']);
 
 	User.findByIdAndUpdate({ _id: req.userData._id }, { $set: body }, { new: true }).then((user) => {
-		res.status(200).json({
+		transporter.sendMail({
+			to: user.email,
+			from: 'interested@marketplace.com',
+			subject: 'Alteração de cadatro',
+			html: '<h1>Seus dados de cadastro foram alterados</h1>'
+		})
+		return res.status(200).json({
 			user: user
 		});
 	}).catch((err) => {
