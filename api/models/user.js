@@ -54,37 +54,21 @@ const userSchema = new Schema({
 		type:Number,
 		default:0
 	},
-	addresses:[{
-		type:mongoose.Schema.Types.ObjectId,
-		ref:'Address'
-	}],
 	interests:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:'Interest'
-    }],items:[{
-		type:mongoose.Schema.Types.ObjectId,
-        ref:'Items'
 	}],
-    proposalsDone:[{
-        type:mongoose.Schema.Types.ObjectId,
-	  	ref:'Proposal'
-	}],
-	proposalsReceived:[{
-        type:mongoose.Schema.Types.ObjectId,
-	  	ref:'Proposal'
-	}]/*,
-	AccessTries: {
-		time: Date,
-		tries: Number
-	}
-	*/
+	contacts:[{
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'Interest'
+	}]
 });
 
 userSchema.methods.toJSON = function () {
 	var user = this;
 	var userObject = user.toObject();
 
-	return _.pick(userObject, ['email','wallet','keys','fullName','cpf','telephone','cellphone','useWhatsapp','interests']);
+	return _.pick(userObject, ['email','wallet','keys','fullName','cpf','telephone','cellphone','useWhatsapp','interests','contacts']);
 };
 
 module.exports = mongoose.model('User', userSchema);
