@@ -32,14 +32,6 @@ const interestSchema = new Schema({
 		type: Number,
 		required:true,
 	},
-	image:{
-		type: String,
-		required:true,
-	},
-	imageName:{
-		type: String,
-		required:true,
-	},
 	active:{
 		type:Boolean,
 		default:true
@@ -47,14 +39,7 @@ const interestSchema = new Schema({
 	finished:{
 		type:Boolean,
 		default:false
-	},
-	_order:{
-		type: mongoose.Schema.Types.ObjectId,
-		default:null
-	},
-	proposals:[{
-		type:mongoose.Schema.Types.ObjectId
-	}]
+	}
 });
 
 interestSchema.methods.toJSON = function(){
