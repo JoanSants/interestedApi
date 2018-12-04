@@ -7,7 +7,6 @@ const Key = require('./../models/key');
 const checkAuth = require('./../middleware/checkAuth');
 
 router.post('/', checkAuth, (req, res) => {
-	console.log('oi')
 	var body = _.pick(req.body,['name','description','price','quantity']);
 	body._creator = req.userData._id;
 	var key = new Key(body);
