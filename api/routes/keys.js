@@ -12,7 +12,7 @@ router.post('/', checkAuth, (req, res) => {
 	var key = new Key(body);
 
 	key.save(body).then((key) => {
-		return res.status(200).json({key:key});
+		return res.status(201).json({key:key});
 	}).catch(err => {
         res.status(500).json({
             error:err
