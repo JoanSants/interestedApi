@@ -221,10 +221,29 @@ router.post('/contact', checkAuth, (req, res) => {
 				}
 			});
 		} else {
-			User.findByIdAndUpdate(req.userData._id, { $addToSet: { contacts: interest._id }, $subtract:{keys: 1} }, { new: true }).then((user) => {
-				return res.status(200).json({
-					user: user
+			User.findByIdAndUpdate(req.userData._id, {$addToSet:{contacts: interest._id}} , { new: false }).then((user) => {
+				const keys = user.keys - 1;
+				const hasContact = user.contacts.find(contact => {
+					return contact.equals(interest._id);
 				})
+
+				if(hasContact){
+					return res.status(400).json({
+						error: {
+							code: '400',
+							message: 'YOU_CAN_NOT_BUY_A_CONTACT_TWICE',
+							errors: {
+								message: 'YOU_CAN_NOT_BUY_A_CONTACT_TWICE',
+							}
+						}
+					})
+				}else{
+					User.findByIdAndUpdate(user._id, {$set:{keys:keys}},{new:true}).then(user => {
+						return res.status(200).json({
+							user: user
+						})
+					})
+				}
 			}).catch((err) => {
 				return res.status(500).json({
 					error: {
