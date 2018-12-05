@@ -61,13 +61,27 @@ router.post('/signin', (req, res, next) => {
 	User.findOne({ email: req.body.email }).populate('interests').populate('contacts').then((user) => {
 		if (!user) {
 			return res.status(401).json({
-				message: 'Auth failed'
-			})
+				error:{
+					code:'401',
+					message: 'AUTHENTICATION_FAILED',
+					errors:{
+						message: 'AUTHENTICATION_FAILED',
+						reason: 'invalid'
+					}
+				}
+			});
 		}
 		bcrypt.compare(req.body.password, user.password, (err, result) => {
 			if (err) {
 				return res.status(401).json({
-					message: 'Auth failed'
+					error:{
+						code:'401',
+						message: 'AUTHENTICATION_FAILED',
+						errors:{
+							message: 'AUTHENTICATION_FAILED',
+							reason: 'invalid'
+						}
+					}
 				});
 			}
 
@@ -93,9 +107,16 @@ router.post('/signin', (req, res, next) => {
 				})
 			}
 
-			res.status(401).json({
-				message: 'Auth failed'
-			})
+			return res.status(401).json({
+				error:{
+					code:'401',
+					message: 'AUTHENTICATION_FAILED',
+					errors:{
+						message: 'AUTHENTICATION_FAILED',
+						reason: 'invalid'
+					}
+				}
+			});
 		});
 	})
 })
