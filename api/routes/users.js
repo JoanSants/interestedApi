@@ -124,12 +124,10 @@ router.post('/contact', checkAuth, (req, res) => {
 		if (_.isEmpty(interest)) {
 			return res.status(404).send('Interest not found');
 		}
-		console.log('interest._creator:' + interest._creator);
-		console.log('req.userData._id:' + req.userData._id);
-		console.log(interest._creator.equals(req.userData._id));
+
 		if (interest._creator.equals(req.userData._id)) {
 			return res.status(400).json({
-				message:'You can\'t obtain your own contact'
+				message: 'You can\'t obtain your own contact'
 			});
 		} else {
 			User.findByIdAndUpdate(req.userData._id, { $addToSet: { contacts: interest._id } }, { new: true }).then((user) => {
@@ -138,7 +136,7 @@ router.post('/contact', checkAuth, (req, res) => {
 				})
 			}).catch((err) => {
 				return res.status(500).json({
-					error:err
+					error: err
 				})
 			});
 		}
@@ -161,9 +159,13 @@ router.get('/contact/:id', checkAuth, (req, res) => {
 			})
 		}
 
-		const userContact = _.pick(user, ['telephone', 'cellphone', 'useWhatsapp', 'fullName']);
-		return res.status(200).json({
-			userContact: userContact
+		Interest.findById(interest).then(interest => {
+			User.findById(interest._creator).then(user => {
+				const userContact = _.pick(user, ['telephone', 'cellphone', 'useWhatsapp', 'fullName']);
+				return res.status(200).json({
+					userContact: userContact
+				})
+			})
 		})
 	}).catch((err) => {
 		return res.status(500).json({
