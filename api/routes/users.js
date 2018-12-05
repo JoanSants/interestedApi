@@ -18,7 +18,7 @@ const transporter = nodemailer.createTransport(sendgridTransport({
 
 router.get('/', checkAuth, (req, res) => {
 	User.findById(req.userData._id).populate('interests').populate('contacts').then(user => {
-		if(!user){
+		if (!user) {
 			return res.status(404).json({
 				error: {
 					code: '404',
@@ -30,7 +30,7 @@ router.get('/', checkAuth, (req, res) => {
 			})
 		}
 		return res.status(200).json({
-			user:user
+			user: user
 		});
 	}).catch(err => {
 		return res.status(500).json({
@@ -221,28 +221,41 @@ router.post('/contact', checkAuth, (req, res) => {
 				}
 			});
 		} else {
-			User.findByIdAndUpdate(req.userData._id, {$addToSet:{contacts: interest._id}} , { new: false }).then((user) => {
+			User.findByIdAndUpdate(req.userData._id, { $addToSet: { contacts: interest._id } }, { new: false }).then((user) => {
 				const keys = user.keys - 1;
-				const hasContact = user.contacts.find(contact => {
-					return contact.equals(interest._id);
-				})
 
-				if(hasContact){
+				if (keys <= 0) {
 					return res.status(400).json({
 						error: {
 							code: '400',
-							message: 'YOU_CAN_NOT_BUY_A_CONTACT_TWICE',
+							message: 'YOU_DO_NOT_HAVE_KEYS',
 							errors: {
-								message: 'YOU_CAN_NOT_BUY_A_CONTACT_TWICE',
+								message: 'YOU_DO_NOT_HAVE_KEYS',
 							}
 						}
 					})
-				}else{
-					User.findByIdAndUpdate(user._id, {$set:{keys:keys}},{new:true}).then(user => {
-						return res.status(200).json({
-							user: user
-						})
+				} else {
+					const hasContact = user.contacts.find(contact => {
+						return contact.equals(interest._id);
 					})
+
+					if (hasContact) {
+						return res.status(400).json({
+							error: {
+								code: '400',
+								message: 'YOU_CAN_NOT_BUY_A_CONTACT_TWICE',
+								errors: {
+									message: 'YOU_CAN_NOT_BUY_A_CONTACT_TWICE',
+								}
+							}
+						})
+					} else {
+						User.findByIdAndUpdate(user._id, { $set: { keys: keys } }, { new: true }).then(user => {
+							return res.status(200).json({
+								user: user
+							})
+						})
+					}
 				}
 			}).catch((err) => {
 				return res.status(500).json({
@@ -280,7 +293,7 @@ router.get('/contact/:id', checkAuth, (req, res) => {
 				}
 			})
 		}
-
+		
 		Interest.findById(interest).then(interest => {
 			User.findById(interest._creator).then(user => {
 				const userContact = _.pick(user, ['telephone', 'cellphone', 'useWhatsapp', 'fullName']);
@@ -289,6 +302,7 @@ router.get('/contact/:id', checkAuth, (req, res) => {
 				})
 			})
 		})
+
 	}).catch((err) => {
 		return res.status(500).json({
 			error: {
