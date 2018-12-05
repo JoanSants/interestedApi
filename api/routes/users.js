@@ -58,7 +58,7 @@ router.post('/signup', (req, res) => {
 });
 
 router.post('/signin', (req, res, next) => {
-	User.findOne({ email: req.body.email }).populate('interests').then((user) => {
+	User.findOne({ email: req.body.email }).populate('interests').populate('contacts').then((user) => {
 		if (!user) {
 			return res.status(401).json({
 				message: 'Auth failed'
