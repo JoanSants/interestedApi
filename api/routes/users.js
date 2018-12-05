@@ -221,7 +221,7 @@ router.post('/contact', checkAuth, (req, res) => {
 				}
 			});
 		} else {
-			User.findByIdAndUpdate(req.userData._id, { $addToSet: { contacts: interest._id } }, { new: true }).then((user) => {
+			User.findByIdAndUpdate(req.userData._id, { $addToSet: { contacts: interest._id }, $subtract:{keys: 1} }, { new: true }).then((user) => {
 				return res.status(200).json({
 					user: user
 				})
