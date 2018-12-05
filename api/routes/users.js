@@ -16,12 +16,46 @@ const transporter = nodemailer.createTransport(sendgridTransport({
 	}
 }));
 
+router.get('/', checkAuth, (req, res) => {
+	User.findById(req.userData._id).populate('interests').populate('contacts').then(user => {
+		if(!user){
+			return res.status(404).json({
+				error: {
+					code: '404',
+					message: 'USER_NOT_FOUND',
+					errors: {
+						message: 'USER_NOT_FOUND',
+					}
+				}
+			})
+		}
+		return res.status(200).json({
+			user:user
+		});
+	}).catch(err => {
+		return res.status(500).json({
+			error: {
+				code: '500',
+				message: 'INTERNAL_SERVER_ERROR',
+				errors: {
+					message: 'INTERNAL_SERVER_ERROR',
+				}
+			}
+		})
+	})
+})
 
 router.post('/signup', (req, res) => {
 	bcrypt.hash(req.body.password, 10, (err, hash) => {
 		if (err) {
 			return res.status(500).json({
-				error: err
+				error: {
+					code: '500',
+					message: 'INTERNAL_SERVER_ERROR',
+					errors: {
+						message: 'INTERNAL_SERVER_ERROR',
+					}
+				}
 			});
 		} else {
 			var body = _.pick(req.body, ['email', 'fullName', 'cpf', 'telephone', 'cellphone', 'useWhatsapp']);
@@ -33,7 +67,13 @@ router.post('/signup', (req, res) => {
 			}).then(user => {
 				if (user.length > 0) {
 					return res.status(409).json({
-						message: 'This email already exists'
+						error: {
+							code: '409',
+							message: 'EMAIL_ALREADY_EXISTS',
+							errors: {
+								message: 'EMAIL_ALREADY_EXISTS',
+							}
+						}
 					})
 				}
 			})
@@ -51,7 +91,15 @@ router.post('/signup', (req, res) => {
 					expiresIn: 3600
 				});
 			}).catch((err) => {
-				res.status(500).json({ error: err });
+				res.status(500).json({
+					error: {
+						code: '500',
+						message: 'INTERNAL_SERVER_ERROR',
+						errors: {
+							message: 'INTERNAL_SERVER_ERROR',
+						}
+					}
+				});
 			});
 		}
 	})
@@ -61,10 +109,10 @@ router.post('/signin', (req, res, next) => {
 	User.findOne({ email: req.body.email }).populate('interests').populate('contacts').then((user) => {
 		if (!user) {
 			return res.status(401).json({
-				error:{
-					code:'401',
+				error: {
+					code: '401',
 					message: 'AUTHENTICATION_FAILED',
-					errors:{
+					errors: {
 						message: 'AUTHENTICATION_FAILED',
 						reason: 'invalid'
 					}
@@ -74,10 +122,10 @@ router.post('/signin', (req, res, next) => {
 		bcrypt.compare(req.body.password, user.password, (err, result) => {
 			if (err) {
 				return res.status(401).json({
-					error:{
-						code:'401',
+					error: {
+						code: '401',
 						message: 'AUTHENTICATION_FAILED',
-						errors:{
+						errors: {
 							message: 'AUTHENTICATION_FAILED',
 							reason: 'invalid'
 						}
@@ -108,10 +156,10 @@ router.post('/signin', (req, res, next) => {
 			}
 
 			return res.status(401).json({
-				error:{
-					code:'401',
+				error: {
+					code: '401',
 					message: 'AUTHENTICATION_FAILED',
-					errors:{
+					errors: {
 						message: 'AUTHENTICATION_FAILED',
 						reason: 'invalid'
 					}
@@ -135,7 +183,15 @@ router.patch('/', checkAuth, (req, res) => {
 			user: user
 		});
 	}).catch((err) => {
-		res.status(500).send(err);
+		res.status(500).json({
+			error: {
+				code: '500',
+				message: 'INTERNAL_SERVER_ERROR',
+				errors: {
+					message: 'INTERNAL_SERVER_ERROR',
+				}
+			}
+		});
 	});
 });
 
@@ -143,12 +199,26 @@ router.post('/contact', checkAuth, (req, res) => {
 
 	Interest.findById(req.body._interest).then((interest) => {
 		if (_.isEmpty(interest)) {
-			return res.status(404).send('Interest not found');
+			return res.status(404).json({
+				error: {
+					code: '404',
+					message: 'INTEREST_NOT_FOUND',
+					errors: {
+						message: 'INTEREST_NOT_FOUND',
+					}
+				}
+			});
 		}
 
 		if (interest._creator.equals(req.userData._id)) {
 			return res.status(400).json({
-				message: 'You can\'t obtain your own contact'
+				error: {
+					code: '400',
+					message: 'YOU_CAN_NOT_OBTAIN_YOUR_OWN_CONTACT',
+					errors: {
+						message: 'YOU_CAN_NOT_OBTAIN_YOUR_OWN_CONTACT',
+					}
+				}
 			});
 		} else {
 			User.findByIdAndUpdate(req.userData._id, { $addToSet: { contacts: interest._id } }, { new: true }).then((user) => {
@@ -157,7 +227,13 @@ router.post('/contact', checkAuth, (req, res) => {
 				})
 			}).catch((err) => {
 				return res.status(500).json({
-					error: err
+					error: {
+						code: '500',
+						message: 'INTERNAL_SERVER_ERROR',
+						errors: {
+							message: 'INTERNAL_SERVER_ERROR',
+						}
+					}
 				})
 			});
 		}
@@ -175,8 +251,14 @@ router.get('/contact/:id', checkAuth, (req, res) => {
 		});
 
 		if (!interest) {
-			return res.status(404).json({
-				message: 'You don\'t have access to this contact'
+			return res.status(400).json({
+				error: {
+					code: '400',
+					message: 'YOU_DO_NOT_HAVE_ACCESS_TO_THIS_CONTACT',
+					errors: {
+						message: 'YOU_DO_NOT_HAVE_ACCESS_TO_THIS_CONTACT',
+					}
+				}
 			})
 		}
 
@@ -190,7 +272,13 @@ router.get('/contact/:id', checkAuth, (req, res) => {
 		})
 	}).catch((err) => {
 		return res.status(500).json({
-			error: err
+			error: {
+				code: '500',
+				message: 'INTERNAL_SERVER_ERROR',
+				errors: {
+					message: 'INTERNAL_SERVER_ERROR',
+				}
+			}
 		});
 	});
 });

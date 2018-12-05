@@ -15,8 +15,16 @@ router.post('/', checkAuth, (req, res) => {
 
 	category.save().then((category)=>{
 		res.status(201).json({category:category});
-	}, (err) => {
-		res.status(500).send(err.message);
+	}).catch(err => {
+		res.status(500).json({
+			error: {
+				code: '500',
+				message: 'INTERNAL_SERVER_ERROR',
+				errors: {
+					message: 'INTERNAL_SERVER_ERROR',
+				}
+			}
+		});
 	})
 })
 
@@ -50,8 +58,14 @@ router.patch('/:id', checkAuth, (req, res) => {
         });
 	}).catch((err) => {
         res.status(500).json({
-            error:err
-        });
+			error: {
+				code: '500',
+				message: 'INTERNAL_SERVER_ERROR',
+				errors: {
+					message: 'INTERNAL_SERVER_ERROR',
+				}
+			}
+		});
     })
 });
 
@@ -60,8 +74,14 @@ router.delete('/:id', checkAuth, (req, res) => {
 
 	if(!ObjectID.isValid(id)){
 		res.status(404).json({
-            message:'Category not found'
-        });
+			error: {
+				code: '404',
+				message: 'CATEGORY_NOT_FOUND',
+				errors: {
+					message: 'CATEGORY_NOT_FOUND',
+				}
+			}
+		});
 	}
 
 	Category.findOneAndRemove({
@@ -70,7 +90,13 @@ router.delete('/:id', checkAuth, (req, res) => {
 	}).then((category) => {
 		if(!category){
 			res.status(404).json({
-                message:'Category not found'
+				error: {
+					code: '404',
+					message: 'CATEGORY_NOT_FOUND',
+					errors: {
+						message: 'CATEGORY_NOT_FOUND',
+					}
+				}
             });
 		}
 		res.status(200).json({
@@ -78,7 +104,15 @@ router.delete('/:id', checkAuth, (req, res) => {
             category:category
         });	
 	}).catch((err) => {
-		res.status(500).send(err);
+		res.status(500).json({
+			error: {
+				code: '500',
+				message: 'INTERNAL_SERVER_ERROR',
+				errors: {
+					message: 'INTERNAL_SERVER_ERROR',
+				}
+			}
+		});
 	});
 });
 

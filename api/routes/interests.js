@@ -14,7 +14,13 @@ router.post('/', checkAuth , (req,res) => {
 	Category.findById(body._category).then((category) => {
 		if(!category){
 			return res.status(404).json({
-				message:'Category not found'
+				error: {
+					code: '404',
+					message: 'CATEGORY_NOT_FOUND',
+					errors: {
+						message: 'CATEGORY_NOT_FOUND',
+					}
+				}
 			});
 		}
 	
@@ -27,7 +33,13 @@ router.post('/', checkAuth , (req,res) => {
 			User.findOneAndUpdate({_id:interest._creator}, {$addToSet:{interests:interest._id}}).then()
 			.catch(err => {
 				return res.status(500).json({
-					error:err
+					error: {
+						code: '500',
+						message: 'INTERNAL_SERVER_ERROR',
+						errors: {
+							message: 'INTERNAL_SERVER_ERROR',
+						}
+					}
 				})
 			})
 
@@ -36,12 +48,24 @@ router.post('/', checkAuth , (req,res) => {
 			});
 		}).catch(err => {
 			res.status(500).json({
-				error:err
+				error: {
+					code: '500',
+					message: 'INTERNAL_SERVER_ERROR',
+					errors: {
+						message: 'INTERNAL_SERVER_ERROR',
+					}
+				}
 			})
 		})
 	}).catch(err => {
 		res.status(500).json({
-			error:err
+			error: {
+				code: '500',
+				message: 'INTERNAL_SERVER_ERROR',
+				errors: {
+					message: 'INTERNAL_SERVER_ERROR',
+				}
+			}
 		});
 	});
 });
@@ -54,7 +78,13 @@ router.get('/', (req, res) => {
 		});
 	}).catch(err => {
 		res.status(500).json({
-			error:err
+			error: {
+				code: '500',
+				message: 'INTERNAL_SERVER_ERROR',
+				errors: {
+					message: 'INTERNAL_SERVER_ERROR',
+				}
+			}
 		})
 	})
 });
@@ -63,13 +93,25 @@ router.get('/:id', (req,res)=>{
 	var _id = req.params.id;
 	if(!ObjectID.isValid(_id)){
 		return res.status(404).json({
-			message:'Interest not found'
+			error: {
+				code: '404',
+				message: 'INTEREST_NOT_FOUND',
+				errors: {
+					message: 'INTEREST_NOT_FOUND',
+				}
+			}
 		});
 	}
 	Interest.findById({_id}).then((interest)=>{
 		if(!interest){
 			return res.status(404).json({
-				message:'Interest not found'
+				error: {
+					code: '404',
+					message: 'INTEREST_NOT_FOUND',
+					errors: {
+						message: 'INTEREST_NOT_FOUND',
+					}
+				}
 			});
 		}
 		res.status(200).json({
@@ -77,7 +119,13 @@ router.get('/:id', (req,res)=>{
 		});
 	}).catch((err) => {
 		res.status(500).json({
-			error:err
+			error: {
+				code: '500',
+				message: 'INTERNAL_SERVER_ERROR',
+				errors: {
+					message: 'INTERNAL_SERVER_ERROR',
+				}
+			}
 		});
 	});
 });
@@ -88,14 +136,26 @@ router.patch('/:id', checkAuth,(req, res) => {
 
 	if(!ObjectID.isValid(id)){
 		return res.status(404).json({
-			message:'Interest not found'
+			error: {
+				code: '404',
+				message: 'INTEREST_NOT_FOUND',
+				errors: {
+					message: 'INTEREST_NOT_FOUND',
+				}
+			}
 		});
 	}
 
 	Interest.findOneAndUpdate({_id:id,_creator:req.userData._id}, {$set:body}, {new:false}).then((interestOld) => {
 		if(!interestOld){
 			return res.status(404).json({
-				message:'interest not found'
+				error: {
+					code: '404',
+					message: 'INTEREST_NOT_FOUND',
+					errors: {
+						message: 'INTEREST_NOT_FOUND',
+					}
+				}
 			});
 		}
 
@@ -108,7 +168,13 @@ router.patch('/:id', checkAuth,(req, res) => {
 
 	}).catch((err) => {
 		res.status(500).json({
-			error:err
+			error: {
+				code: '500',
+				message: 'INTERNAL_SERVER_ERROR',
+				errors: {
+					message: 'INTERNAL_SERVER_ERROR',
+				}
+			}
 		})
 	});
 });
@@ -118,7 +184,13 @@ router.delete('/:id', checkAuth, (req,res) => {
 
 	if(!ObjectID.isValid(id)){
 		return res.status(404).json({
-			message:'Interest not found'
+			error: {
+				code: '404',
+				message: 'INTEREST_NOT_FOUND',
+				errors: {
+					message: 'INTEREST_NOT_FOUND',
+				}
+			}
 		});
 	}
 
@@ -128,7 +200,13 @@ router.delete('/:id', checkAuth, (req,res) => {
 	}).then((interest) => {
 		if(!interest){
 			return res.status(404).json({
-				message:'Interest not found'
+				error: {
+					code: '404',
+					message: 'INTEREST_NOT_FOUND',
+					errors: {
+						message: 'INTEREST_NOT_FOUND',
+					}
+				}
 			});
 		}
 
@@ -144,7 +222,13 @@ router.delete('/:id', checkAuth, (req,res) => {
 		});
 	}).catch((err) => {
 		res.status(500).json({
-			error:err
+			error: {
+				code: '500',
+				message: 'INTERNAL_SERVER_ERROR',
+				errors: {
+					message: 'INTERNAL_SERVER_ERROR',
+				}
+			}
 		});
 	})
 });
