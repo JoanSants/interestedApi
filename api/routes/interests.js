@@ -9,7 +9,7 @@ const Category = require('./../models/category');
 const User = require('./../models/user');
 
 router.post('/', checkAuth , (req,res) => {
-	var body = _.pick(req.body,['_category','name','description','price']);
+	var body = _.pick(req.body,['_category','name','description','price', 'urlImage']);
 
 	Category.findById(body._category).then((category) => {
 		if(!category){
@@ -132,7 +132,7 @@ router.get('/:id', (req,res)=>{
 
 router.patch('/:id', checkAuth,(req, res) => {
 	var id = req.params.id;
-	var body = _.pick(req.body,['_category','name','description','price']);
+	var body = _.pick(req.body,['_category','name','description','price', 'urlImage']);
 
 	if(!ObjectID.isValid(id)){
 		return res.status(404).json({

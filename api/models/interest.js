@@ -32,6 +32,11 @@ const interestSchema = new Schema({
 		type: Number,
 		required:true,
 	},
+	urlImage:{
+		type: String,
+		required: true,
+		trim: true
+	},
 	active:{
 		type:Boolean,
 		default:true
@@ -46,7 +51,7 @@ interestSchema.methods.toJSON = function(){
 	var interest = this;
 	var interestObject = interest.toObject();
 
-	return _.pick(interestObject,['active','_id','_category','name','description','price','_creator','image','imageName']);
+	return _.pick(interestObject,['active','_id','_category','name','description','price','_creator','urlImage']);
 }
 
 module.exports = mongoose.model('Interest', interestSchema);
