@@ -296,7 +296,7 @@ router.get('/contact/:id', checkAuth, (req, res) => {
 		
 		Interest.findById(interest).then(interest => {
 			User.findById(interest._creator).then(user => {
-				const userContact = _.pick(user, ['_id','telephone', 'cellphone', 'useWhatsapp', 'fullName']);
+				const userContact = _.pick(user, ['_id','telephone', 'cellphone', 'useWhatsapp', 'fullName','email']);
 				return res.status(200).json({
 					userContact: userContact
 				})
