@@ -3,10 +3,6 @@ const Schema = mongoose.Schema;
 const _ = require('lodash');
 
 const interestSchema = new Schema({
-	_category:{
-		type: mongoose.Schema.Types.ObjectId,
-		required:true
-	},
 	_creator:{
 		type: mongoose.Schema.Types.ObjectId,
 		required:true
@@ -51,7 +47,7 @@ interestSchema.methods.toJSON = function(){
 	var interest = this;
 	var interestObject = interest.toObject();
 
-	return _.pick(interestObject,['active','_id','_category','name','description','price','_creator','urlImage']);
+	return _.pick(interestObject,['active','_id','name','description','price','_creator','urlImage']);
 }
 
 module.exports = mongoose.model('Interest', interestSchema);

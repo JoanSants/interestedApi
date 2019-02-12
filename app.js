@@ -8,7 +8,6 @@ mongoose.connect('mongodb+srv://InterestAdmin:'+ process.env.MONGO_ATLAS_PW +'@i
 
 const userRoutes = require('./api/routes/users');
 const interestRoutes = require('./api/routes/interests');
-const categoryRoutes = require('./api/routes/categories');
 const keyRoutes = require('./api/routes/keys');
 
 app.use(bodyParser.urlencoded({extended:false}));
@@ -30,7 +29,6 @@ app.use((req, res, next) => {
 
 app.use('/users', userRoutes);
 app.use('/interests', interestRoutes);
-app.use('/categories', categoryRoutes);
 app.use('/keys', keyRoutes);
 
 module.exports = app;

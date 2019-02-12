@@ -5,24 +5,10 @@ const _ = require('lodash');
 
 const checkAuth = require('./../middleware/checkAuth');
 const Interest = require('./../models/interest');
-const Category = require('./../models/category');
 const User = require('./../models/user');
 
 router.post('/', checkAuth , (req,res) => {
-	var body = _.pick(req.body,['_category','name','description','price', 'urlImage']);
-
-	Category.findById(body._category).then((category) => {
-		if(!category){
-			return res.status(404).json({
-				error: {
-					code: '404',
-					message: 'CATEGORY_NOT_FOUND',
-					errors: {
-						message: 'CATEGORY_NOT_FOUND',
-					}
-				}
-			});
-		}
+	var body = _.pick(req.body,['name','description','price', 'urlImage']);
 	
 		body.createdAt = new Date();		
 		body._creator = req.userData._id;
@@ -57,17 +43,6 @@ router.post('/', checkAuth , (req,res) => {
 				}
 			})
 		})
-	}).catch(err => {
-		res.status(500).json({
-			error: {
-				code: '500',
-				message: 'INTERNAL_SERVER_ERROR',
-				errors: {
-					message: 'INTERNAL_SERVER_ERROR',
-				}
-			}
-		});
-	});
 });
 
 router.get('/', (req, res) => {
@@ -132,7 +107,7 @@ router.get('/:id', (req,res)=>{
 
 router.patch('/:id', checkAuth,(req, res) => {
 	var id = req.params.id;
-	var body = _.pick(req.body,['_category','name','description','price', 'urlImage']);
+	var body = _.pick(req.body,['name','description','price', 'urlImage']);
 
 	if(!ObjectID.isValid(id)){
 		return res.status(404).json({
