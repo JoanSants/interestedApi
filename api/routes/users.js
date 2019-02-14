@@ -58,7 +58,7 @@ router.post('/signup', (req, res) => {
 				}
 			});
 		} else {
-			var body = _.pick(req.body, ['email', 'fullName', 'cpf', 'telephone', 'cellphone', 'useWhatsapp']);
+			var body = _.pick(req.body, ['email', 'fullName', 'telephone', 'cellphone', 'useWhatsapp']);
 			body.password = hash;
 			var user = new User(body);
 
@@ -170,7 +170,7 @@ router.post('/signin', (req, res, next) => {
 })
 
 router.patch('/', checkAuth, (req, res) => {
-	var body = _.pick(req.body, ['fullName', 'cpf', 'telephone', 'cellphone', 'useWhatsapp']);
+	var body = _.pick(req.body, ['fullName', 'telephone', 'cellphone', 'useWhatsapp']);
 
 	User.findByIdAndUpdate({ _id: req.userData._id }, { $set: body }, { new: true }).then((user) => {
 		transporter.sendMail({

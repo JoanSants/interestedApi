@@ -23,12 +23,6 @@ const userSchema = new Schema({
 		maxlength:50,
 		trim:true
 	},
-	cpf:{
-		type:String,
-		required:true,
-		trim:true,
-		match:/([0-9]{2}[\.]?[0-9]{3}[\.]?[0-9]{3}[\/]?[0-9]{4}[-]?[0-9]{2})|([0-9]{3}[\.]?[0-9]{3}[\.]?[0-9]{3}[-]?[0-9]{2})/
-	},
 	telephone:{
 		type:String,
 		minlength:10,
@@ -68,7 +62,7 @@ userSchema.methods.toJSON = function () {
 	var user = this;
 	var userObject = user.toObject();
 
-	return _.pick(userObject, ['_id','email','wallet','keys','fullName','cpf','telephone','cellphone','useWhatsapp','interests','contacts']);
+	return _.pick(userObject, ['_id','email','wallet','keys','fullName','telephone','cellphone','useWhatsapp','interests','contacts']);
 };
 
 module.exports = mongoose.model('User', userSchema);
