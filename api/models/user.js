@@ -31,8 +31,8 @@ const userSchema = new Schema({
 	},
 	cellphone:{
 		type:String,
-		minlength:11,
-		maxlength:11,
+		minlength:13,
+		maxlength:13,
 		required:true,
 		trim:true
 	},
