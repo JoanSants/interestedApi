@@ -167,7 +167,7 @@ router.post('/signin', (req, res, next) => {
 			});
 		});
 	})
-})
+});
 
 router.patch('/', checkAuth, (req, res) => {
 	var body = _.pick(req.body, ['fullName', 'telephone', 'cellphone', 'useWhatsapp']);
@@ -196,8 +196,8 @@ router.patch('/', checkAuth, (req, res) => {
 });
 
 router.post('/contact', checkAuth, (req, res) => {
-
 	Interest.findById(req.body._interest).then((interest) => {
+
 		if (_.isEmpty(interest)) {
 			return res.status(404).json({
 				error: {
@@ -220,24 +220,25 @@ router.post('/contact', checkAuth, (req, res) => {
 					}
 				}
 			});
-		} else {
-			User.findByIdAndUpdate(req.userData._id, { $addToSet: { contacts: interest._id } }, { new: false }).then((user) => {
-				const keys = user.keys - 1;
+		}
 
-				if (keys <= 0) {
-					return res.status(400).json({
-						error: {
-							code: '400',
+		User.findById(req.userData._id).then(user => {
+			const keys = user.keys - 1;
+			if (keys <= 0) {
+				return res.status(400).json({
+					error: {
+						code: '400',
+						message: 'YOU_DO_NOT_HAVE_KEYS',
+						errors: {
 							message: 'YOU_DO_NOT_HAVE_KEYS',
-							errors: {
-								message: 'YOU_DO_NOT_HAVE_KEYS',
-							}
 						}
-					})
-				} else {
+					}
+				});
+			} else {
+				User.findByIdAndUpdate(req.userData._id, { $addToSet: { contacts: interest._id } }, { new: false }).then((user) => {
 					const hasContact = user.contacts.find(contact => {
 						return contact.equals(interest._id);
-					})
+					});
 
 					if (hasContact) {
 						return res.status(400).json({
@@ -256,23 +257,24 @@ router.post('/contact', checkAuth, (req, res) => {
 							})
 						})
 					}
-				}
-			}).catch((err) => {
-				return res.status(500).json({
-					error: {
-						code: '500',
-						message: 'INTERNAL_SERVER_ERROR',
-						errors: {
-							message: 'INTERNAL_SERVER_ERROR',
-						}
-					}
 				})
-			});
-		}
-	}).catch((err) => {
-		res.send(err);
+			}
+		}).catch((err) => {
+			return res.status(500).json({
+				error: {
+					code: '500',
+					message: 'INTERNAL_SERVER_ERROR',
+					errors: {
+						message: 'INTERNAL_SERVER_ERROR',
+					}
+				}
+			})
+		});
 	});
 });
+
+
+
 
 router.get('/contact/:id', checkAuth, (req, res) => {
 	const interestId = req.params.id;
@@ -293,10 +295,10 @@ router.get('/contact/:id', checkAuth, (req, res) => {
 				}
 			})
 		}
-		
+
 		Interest.findById(interest).then(interest => {
 			User.findById(interest._creator).then(user => {
-				const userContact = _.pick(user, ['_id','telephone', 'cellphone', 'useWhatsapp', 'fullName','email']);
+				const userContact = _.pick(user, ['_id', 'telephone', 'cellphone', 'useWhatsapp', 'fullName', 'email']);
 				return res.status(200).json({
 					userContact: userContact
 				})
